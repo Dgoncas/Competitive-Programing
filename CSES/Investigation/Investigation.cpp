@@ -1,28 +1,11 @@
 #include <bits/stdc++.h>
 
-#define MOD (long long) 1e9+7
-#define INF LONG_MAX/10;
+#define INF LONG_MAX/2
+#define MOD ((long long)1e9+7)
 
 using namespace std;
 
-
 vector<pair<int,int>> nodes[(int)1e5];
-vector<int> sorted;
-
-int states[(int)1e5];
-long long ways[(int)1e5];
-
-long long minPrice[(int)1e5];
-
-void topSort(int node){
-	if(states[node]!=0) return;
-	states[node]=1;
-	for(auto nei:nodes[node]){
-		topSort(nei.first);
-	}
-	states[node]=2;
-	sorted.push_back(node);
-}
 
 int main(){
 
@@ -36,23 +19,59 @@ int main(){
 		nodes[a].push_back({b,c});
 	}
 
-	topSort(0);
-	reverse(sorted.begin(),sorted.end());
+	long long dist[n];
+	priority_queue<pair<int,int>> q;
+	bool visited[n];
+
+	int numMinPriceRoutes[n];
+	int minF[n];
+	int maxF[n];
+
 
 	for(int i=0;i<n;i++){
-		minPrice[i]=INF;
+		dist[i]=INF;
+		visited[i]=0;
+
+		numMinPriceRoutes[i]=0;
+		minF[i]=INF;
+		maxF[i]=0;
 	}
 
-	minPrice[0]=0;
+	dist[0]=0;
+	numMinPriceRoutes[0]=1;
+	minF[0]=0;
+	maxF[0]=0;
 
-	ways[0]=1;
-	for(auto node:sorted){
-		for(auto nei:nodes[node]){
-			minPrice[nei.first]=min(minPrice[nei.first],minPrice[node]+nei.second);
+	q.push({0,0});
+	while(!q.empty()){
+		int a=q.top().second;q.pop();
+		if(visited[a]) continue;
+		visited[a]=true;
+
+		for(auto nei:nodes[a]){
+			int b=nei.first; int d=nei.second;
+
+			if(dist[a]+d < dist[b]){
+				dist[b]=dist[a]+d;
+
+				numMinPriceRoutes[b]=numMinPriceRoutes[a];
+				minF[b]=minF[a]+1;
+				maxF[b]=maxF[a]+1;
+			}else if(dist[a]+d == dist[b]){
+				numMinPriceRoutes[b]+=numMinPriceRoutes[a];
+				numMinPriceRoutes[b]%=MOD;
+				minF[b]=min(minF[a]+1,minF[b]);
+				maxF[b]=max(maxF[a]+1,maxF[b]);
+			}
+
+			q.push({-dist[b],b});
 		}
 	}
 
-	cout<<minPrice[n-1]<<" ";
+	cout<<dist[n-1]<<" ";
+	cout<<numMinPriceRoutes[n-1]<<" ";
+	cout<<minF[n-1]<<" ";
+	cout<<maxF[n-1]<<endl;
 
 	return 0;
 }
