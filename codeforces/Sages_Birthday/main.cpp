@@ -7,31 +7,36 @@ int main(){
 	cin>>n;
 
 	int balls[n];
+	int ans[n];
 
 	for(int i=0;i<n;i++)
 		cin>>balls[i];
 
 	sort(balls,balls+n);
+	reverse(balls,balls+n);
 
-	int index=0,l=0,r=n-1;
-	int ans[n];
-	while(l<=r){
-		ans[index]=balls[r];
-		if(l==r) break;
-		index++;r--;
-		ans[index]=balls[l];
-		index++;l++;
+	int expensive = 0,cheap = ceil(n/2);
+
+	int index=0;
+	int valid=0;
+	while(index<n){
+		if(expensive<n){
+			ans[index] = balls[expensive];
+			index++;
+		}
+		if(cheap<n){
+			ans[index] = balls[cheap];
+			index++;
+			valid++;
+			if(index==n) valid--;
+		}
+		expensive++;
+		cheap++;
 	}
 
-	int cuant=0;
-	for(int i=1;i<n-1;i+=2){
-		if(ans[i-1]> ans[i] && ans[i+1]>ans[i])
-			cuant++;
-	}
-
-	cout<<cuant<<endl;
-	for(int n:ans)
-		cout<<n<<" ";
+	cout<<valid<<endl;
+	for(auto a:ans)
+		cout<<a<<" ";
 	cout<<endl;
 
 }
